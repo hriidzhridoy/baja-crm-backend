@@ -1,5 +1,13 @@
 import mongoose from "mongoose";
 
+export const clientCityZonesByCity = {
+  "Cabo San Lucas": ["Cabo Zone 1", "Cabo Zone 2"],
+  "San José del Cabo": ["San José Zone 1", "San José Zone 2"],
+};
+
+export const clientCities = Object.keys(clientCityZonesByCity);
+export const clientCityZones = Object.values(clientCityZonesByCity).flat();
+
 const clientSchema = new mongoose.Schema(
   {
     agentFromBPW: String,
@@ -10,6 +18,8 @@ const clientSchema = new mongoose.Schema(
     email: String,
     phone: String,
     address: String,
+    city: { type: String, required: true, enum: clientCities },
+    cityZone: { type: String, required: true, enum: clientCityZones },
     lastConversationDate: String,
     conversationNotes: String,
     rmr: { type: Number, default: 0 },
