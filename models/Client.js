@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 export const clientCityZonesByCity = {
   "Cabo San Lucas": ["Cabo Zone 1", "Cabo Zone 2"],
-  "San José del Cabo": ["San José Zone 1", "San José Zone 2"],
+  "San Jose del Cabo": ["San Jose Zone 1", "San Jose Zone 2"],
 };
 
 export const clientCities = Object.keys(clientCityZonesByCity);
