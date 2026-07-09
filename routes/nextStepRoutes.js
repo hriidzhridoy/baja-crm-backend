@@ -53,4 +53,52 @@ router.post(
   },
 );
 
+router.put("/:id", protect, allowRoles("admin", "editor"), async (req, res) => {
+  const step = await NextStep.findById(req.params.id);
+
+  if (!step) {
+    return res.status(404).json({ message: "Task not found" });
+  }
+
+  step.note = req.body.note ?? step.note;
+  step.nextActionDate = req.body.nextActionDate ?? step.nextActionDate;
+  step.nextActionTime = req.body.nextActionTime ?? step.nextActionTime;
+
+  await step.save();
+
+  const updatedStep = await NextStep.findById(step._id).populate(
+    "createdBy",
+    "name email role",
+  );
+
+  await Client.findByIdAndUpdate(updatedStep.clientId, {
+    lastConversationDate: new Date().toISOString().slice(0, 10),
+    updatedBy: req.user._id,
+  });
+
+  res.json(updatedStep);
+});
+
+router.delete(
+  "/:id",
+  protect,
+  allowRoles("admin", "editor"),
+  async (req, res) => {
+    const step = await NextStep.findById(req.params.id);
+
+    if (!step) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    await Client.findByIdAndUpdate(step.clientId, {
+      lastConversationDate: new Date().toISOString().slice(0, 10),
+      updatedBy: req.user._id,
+    });
+
+    await step.deleteOne();
+
+    res.json({ message: "Task deleted" });
+  },
+);
+
 export default router;
