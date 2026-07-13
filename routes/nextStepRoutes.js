@@ -49,7 +49,12 @@ router.post(
       updatedBy: req.user._id,
     });
 
-    res.status(201).json(step);
+    const createdStep = await NextStep.findById(step._id).populate(
+      "createdBy",
+      "name email role",
+    );
+
+    res.status(201).json(createdStep);
   },
 );
 
