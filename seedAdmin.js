@@ -7,27 +7,28 @@ await connectDB();
 
 const createAdmin = async () => {
   try {
-    const exists = await User.findOne({ email: "admin@bpw.com" });
+    const email = "steve@bajapurewater.com";
+
+    const exists = await User.findOne({ email });
 
     if (exists) {
-      console.log("Admin already exists");
-      process.exit();
+      console.log("Steve admin already exists");
+      process.exit(0);
     }
 
     await User.create({
-      name: "BPW Admin",
-      email: "admin@bpw.com",
-      password: "password123",
+      name: "Steve",
+      email,
+      password: "stevejasco33##",
       role: "admin",
     });
 
-    console.log("Admin created");
-    console.log("Email: admin@bpw.com");
-    console.log("Password: password123");
+    console.log("Steve admin created successfully");
+    console.log(`Email: ${email}`);
 
-    process.exit();
+    process.exit(0);
   } catch (error) {
-    console.error(error);
+    console.error("Failed to create Steve admin:", error);
     process.exit(1);
   }
 };

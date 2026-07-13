@@ -6,6 +6,7 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import clientRoutes from "./routes/clientRoutes.js";
 import nextStepRoutes from "./routes/nextStepRoutes.js";
+import reminderRoutes from "./routes/reminderRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -46,6 +47,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/clients", clientRoutes);
 app.use("/api/next-steps", nextStepRoutes);
+app.use("/api/reminders", reminderRoutes);
 
 const PORT = process.env.PORT || 5000;
 
