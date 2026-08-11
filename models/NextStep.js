@@ -10,6 +10,16 @@ const nextStepSchema = new mongoose.Schema(
     note: { type: String, required: true },
     nextActionDate: String,
     nextActionTime: String,
+    status: {
+      type: String,
+      enum: ["Open", "Done"],
+      default: "Open",
+    },
+    completedAt: Date,
+    completedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

@@ -12,6 +12,7 @@ router.get("/", protect, async (req, res) => {
   const steps = await NextStep.find(query)
     .populate("clientId", "companyName personMetWith phone stage")
     .populate("createdBy", "name email role")
+    .populate("completedBy", "name email role")
     .sort({ nextActionDate: 1, nextActionTime: 1, createdAt: -1 });
 
   res.json(steps);
@@ -20,6 +21,7 @@ router.get("/", protect, async (req, res) => {
 router.get("/client/:clientId", protect, async (req, res) => {
   const steps = await NextStep.find({ clientId: req.params.clientId })
     .populate("createdBy", "name email role")
+    .populate("completedBy", "name email role")
     .sort({ nextActionDate: 1, nextActionTime: 1, createdAt: -1 });
 
   res.json(steps);
@@ -52,7 +54,7 @@ router.post(
     const createdStep = await NextStep.findById(step._id).populate(
       "createdBy",
       "name email role",
-    );
+    ).populate("completedBy", "name email role");
 
     res.status(201).json(createdStep);
   },
@@ -69,12 +71,30 @@ router.put("/:id", protect, allowRoles("admin", "editor"), async (req, res) => {
   step.nextActionDate = req.body.nextActionDate ?? step.nextActionDate;
   step.nextActionTime = req.body.nextActionTime ?? step.nextActionTime;
 
+  if (req.body.status !== undefined) {
+    if (!["Open", "Done"].includes(req.body.status)) {
+      return res.status(400).json({ message: "Invalid task status" });
+    }
+
+    if (req.body.status === "Done" && step.status !== "Done") {
+      step.completedAt = new Date();
+      step.completedBy = req.user._id;
+    }
+
+    if (req.body.status === "Open") {
+      step.completedAt = undefined;
+      step.completedBy = undefined;
+    }
+
+    step.status = req.body.status;
+  }
+
   await step.save();
 
   const updatedStep = await NextStep.findById(step._id).populate(
     "createdBy",
     "name email role",
-  );
+  ).populate("completedBy", "name email role");
 
   await Client.findByIdAndUpdate(updatedStep.clientId, {
     lastConversationDate: new Date().toISOString().slice(0, 10),
